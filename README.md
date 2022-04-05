@@ -2,11 +2,11 @@
  Creates Tasks in Planner from Calendar Events from a User
 
 ## ➤ Longer Description
- This was created with C# to pull from a shared calendar each month and create tasks in Planner so we can assign them to people manually afterward. In our use case we are pulling the subject and preview of the body as the task title and description, as well as the end date of said calendar event as the due date. 
+ This was created with C# and the Graph API to pull from a shared calendar each month and create tasks in Planner so we can assign them to people manually afterward. In our use case we are pulling the subject and preview of the body as the task title and description, as well as the end date of said calendar event as the due date. 
 
 ## ➤ Resources
  Things I used: 
- Visual Studio Code, C#, .NET 6.0, Azure App Registrations.
+ Visual Studio Code, C#, .NET 6.0, Graph API, Azure App Registrations, Postman.
  
  I created this using a few basic resources, starting with [this guide](https://github.com/microsoftgraph/dotnetcore-console-sample) which is the basic foundation of the app. Secondly I used [Postman](https://www.postman.com) and [this guide](https://dzone.com/articles/getting-access-token-for-microsoft-graph-using-oau) to create an access token which I will get into further down.
 
