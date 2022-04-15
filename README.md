@@ -6,7 +6,7 @@
 
 ## ➤ Resources
  Things I used: 
- Visual Studio Code, C#, .NET 6.0, Graph API, Azure App Registrations, Postman.
+ Visual Studio Code, C#, .NET 6.0, Graph API, Azure App Registrations, Postman, Restsharp.
  
  I created this using a few basic resources, starting with [this guide](https://github.com/microsoftgraph/dotnetcore-console-sample) which is the basic foundation of the app. Secondly I used [Postman](https://www.postman.com) and [this guide](https://dzone.com/articles/getting-access-token-for-microsoft-graph-using-oau) to create an access token which I will get into further down.
 
@@ -35,15 +35,31 @@ Starting with the most important part, appsettings.json, we're going to need you
 
 Now that is set up, lets move into the Helpers folder and work with PlannerHelper.cs. This is where your inner 12yo hacker self can come out as we'll be doing some inspect element fun. Lines 20, 25, and 27 have some variables for you to change. You can find the first two in your planner url at https://tasks.office.com/
 
-Get yourself into the group and plan you want to be in, then copy out your url bar such as this (obviously not my real one) where you'll find your groupId and planId waiting for you to copy over. 
+Get yourself into the group and plan you want to be in, then copy out your url bar such as this (obviously not my real one) where you'll find your groupId and planId waiting for you to copy over. Why didn't I put these into the appsettings.json? I don't know, maybe I will in the future (probably not) I didn't think this far ahead when I started.
 
 ``https://tasks.office.com/yourdomain.com/en-US/Home/Planner/#/plantaskboard?groupId=3439sdad-ce16-4eaa-73b1-9f6c236854155&planId=yi7xKSBr054DseEFM89wi2UAHg9l``
 
 Next we need the bucketId and this is where you get to have a little old school fun. Right Click and Inspect Element on your bucket that you want the tasks to be dropped into. From here you should end up at the h3 tag, go up a couple divs until you reach the li tag, then find your id and copy that out, that's your bucketId. 
 
-Congratulations, we're done! Unless you want to automate it and not prompt for a user to log in all the time. Then, we'll need to open up DeviceCodeFlowAuthorizationProvider.cs. 
+Congratulations, we're done! Unless you want to automate it and not prompt for a user to log in all the time. Then, we'll need to do a couple different things. Open back up that appsettings.json file we got some extra work to do.
 
-Down on line 14 you'll find yourself a nice little null variable, this is what you'll need to change. Run Flow 2 from [the second guide](https://dzone.com/articles/getting-access-token-for-microsoft-graph-using-oau) using Postman, or whatever you prefer, fill out the info, and copy your token into this variable; wrap it up in some nice quotation marks and voila, don't need to be prompted again (until you change your password).
+Running Flow 2 from [the second guide](https://dzone.com/articles/getting-access-token-for-microsoft-graph-using-oau) using Postman, or whatever you prefer, I pulled out the C# Rest code and suffered as I found out it hasn't been updated with how RestSharp works anymore and solved all the problems for you. This is the real automation. All the things you need to update are in appsettings.json. The first two you don't need to touch, get your username and password in there, and for the final microsoftLogin, change "yourdomainid" to the same tenantId from earlier in the file.
+
+    {
+        
+    "grant_type": "password",
+    
+    "resource": "https://graph.microsoft.com",
+    
+    "username": "username@yourdomain.com",
+    
+    "password": "actually the password",
+    
+    "microsoftLogin": "https://login.microsoftonline.com/yourdomainid/oauth2/token"
+
+    }
+
+"But wait, you're storing the password in plain text!" I can hear you screaming, well this is on a secure server for an account specifically for this purpose with very limited access to who can even see it, so it doesn't matter in my case, if you need to encrypt it, go for it.
 
 Now most of the changes if you'd like to change the way it works will be made in PlannerHelper.cs. This script by default checks the next month of the logged in user's calendar and pulls specific info, you can change the date range on lines 29 and 30, and the info/if you want to change what it searches, below that.
 

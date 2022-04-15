@@ -7,6 +7,8 @@ using Microsoft.Identity.Client;
 using Microsoft.Graph;
 using Microsoft.Extensions.Configuration;
 
+
+
 namespace GraphTaskFromCalendar
 {
     public class Program
@@ -14,7 +16,7 @@ namespace GraphTaskFromCalendar
         private static GraphServiceClient _graphServiceClient;
         private static HttpClient _httpClient;
 
-        private static IConfigurationRoot LoadAppSettings()
+        public static IConfigurationRoot LoadAppSettings()
         {
             try
             {
@@ -28,7 +30,9 @@ namespace GraphTaskFromCalendar
                     string.IsNullOrEmpty(config["applicationSecret"]) ||
                     string.IsNullOrEmpty(config["redirectUri"]) ||
                     string.IsNullOrEmpty(config["tenantId"]) ||
-                    string.IsNullOrEmpty(config["domain"]))
+                    string.IsNullOrEmpty(config["domain"]) ||
+                    string.IsNullOrEmpty(config["username"]) ||
+                    string.IsNullOrEmpty(config["password"]))
                 {
                     return null;
                 }
@@ -40,20 +44,36 @@ namespace GraphTaskFromCalendar
                 return null;
             }
         }
+        
         private static IAuthenticationProvider CreateAuthorizationProvider(IConfigurationRoot config)
         {
-            var clientId = config["applicationId"];
             var redirectUri = config["redirectUri"];
+            var grantType = config["grant_type"];
+            var clientId = config["applicationId"];
+            var clientSecret = config["applicationSecret"];
+            var resource = config["resource"];
+            var username = config["username"];
+            var password = config["password"];
+            var website = config["microsoftLogin"];
             var authority = $"https://login.microsoftonline.com/{config["tenantId"]}";
 
             List<string> scopes = new List<string>();
             scopes.Add("https://graph.microsoft.com/.default");
 
+            List<string> login = new List<string>();
+            login.Add(grantType);
+            login.Add(clientId);
+            login.Add(clientSecret);
+            login.Add(resource);
+            login.Add(username);
+            login.Add(password);
+            login.Add(website);
+
             var pca = PublicClientApplicationBuilder.Create(clientId)
                                                     .WithAuthority(authority)
                                                     .WithRedirectUri(redirectUri)
                                                     .Build();
-            return new DeviceCodeFlowAuthorizationProvider(pca, scopes);
+            return new DeviceCodeFlowAuthorizationProvider(pca, scopes, login);
         }
 
         private static GraphServiceClient GetAuthenticatedGraphClient(IConfigurationRoot config)
@@ -83,6 +103,10 @@ namespace GraphTaskFromCalendar
             var plannerHelper = new PlannerHelper(GraphServiceClient);
             plannerHelper.PlannerHelperCall().GetAwaiter().GetResult();
 
+
+
         }
+
     }
+    
 }
